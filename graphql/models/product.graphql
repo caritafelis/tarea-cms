@@ -1,0 +1,138 @@
+type Product {
+    id: ID!
+    name: String!
+    slug: String!
+    sku: String
+    barcode: String
+    description: String
+    summary: String
+    featured: Boolean!
+    is_visible: Boolean!
+    allow_backorder: Boolean!
+    type: String
+    published_at: DateTime
+    weight: Float
+    height: Float
+    width: Float
+    length: Float
+    brand: Brand @belongsTo
+    supplier: Supplier @belongsTo
+    categories: [Category!]! @belongsToMany
+    tags: [ProductTag!]! @belongsToMany
+    variants: [ProductVariant!]! @hasMany
+    prices: [Price!]! @hasMany
+    created_at: DateTime!
+    updated_at: DateTime!
+    sections: [ContentSection!]! @hasMany(relation: "contentSections")
+}
+
+type ProductVariant {
+    id: ID!
+    name: String!
+    sku: String
+    barcode: String
+    ean: String
+    upc: String
+    allow_backorder: Boolean!
+    position: Int!
+    weight: Float
+    height: Float
+    width: Float
+    length: Float
+    product: Product! @belongsTo
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Category {
+    id: ID!
+    name: String!
+    slug: String
+    description: String
+    position: Int!
+    is_enabled: Boolean!
+    parent: Category @belongsTo
+    children: [Category!]! @hasMany
+    products: [Product!]! @belongsToMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Brand {
+    id: ID!
+    name: String!
+    slug: String
+    website: String
+    description: String
+    position: Int!
+    is_enabled: Boolean!
+    products: [Product!]! @hasMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Supplier {
+    id: ID!
+    name: String!
+    slug: String
+    email: String
+    phone: String
+    contact_name: String
+    website: String
+    description: String
+    notes: String
+    is_enabled: Boolean!
+    products: [Product!]! @hasMany
+}
+
+type Collection {
+    id: ID!
+    name: String!
+    slug: String
+    description: String
+    type: String!
+    sort: String
+    match_conditions: String
+    published_at: DateTime
+    rules: [CollectionRule!]! @hasMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type CollectionRule {
+    id: ID!
+    rule: String!
+    operator: String!
+    value: String!
+    collection: Collection! @belongsTo
+}
+
+type Attribute {
+    id: ID!
+    name: String!
+    slug: String
+    description: String
+    type: String!
+    is_enabled: Boolean!
+    is_searchable: Boolean!
+    is_filterable: Boolean!
+    icon: String
+    values: [AttributeValue!]! @hasMany
+}
+
+type AttributeValue {
+    id: ID!
+    value: String!
+    key: String!
+    position: Int
+    attribute: Attribute! @belongsTo
+}
+
+type Review {
+    id: ID!
+    is_recommended: Boolean!
+    rating: Int!
+    title: String
+    content: String
+    approved: Boolean!
+}

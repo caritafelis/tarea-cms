@@ -1,0 +1,27 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Geolocation;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Tests\Core\Stubs\User;
+
+/**
+ * @extends Factory<Geolocation>
+ */
+class GeolocationFactory extends Factory
+{
+    protected $model = Geolocation::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'user_id' => User::factory(),
+        ];
+    }
+}

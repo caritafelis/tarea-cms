@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Contracts;
+
+interface TaxableItem
+{
+    public function getTaxableTotal(): int;
+
+    public function getProductType(): ?string;
+
+    public function getProductId(): ?int;
+
+    /** @return array<int, int> */
+    public function getCategoryIds(): array;
+}

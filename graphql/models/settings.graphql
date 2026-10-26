@@ -1,0 +1,110 @@
+type Zone {
+    id: ID!
+    name: String!
+    slug: String
+    code: String
+    is_enabled: Boolean!
+    currency: Currency! @belongsTo
+}
+
+type TaxZone {
+    id: ID!
+    name: String
+    province_code: String
+    is_tax_inclusive: Boolean!
+    country: Country @belongsTo
+    rates: [TaxRate!]! @hasMany
+}
+
+type TaxRate {
+    id: ID!
+    name: String!
+    code: String
+    rate: Float!
+    is_default: Boolean!
+    is_combinable: Boolean!
+    taxZone: TaxZone! @belongsTo(relation: "taxZone")
+}
+
+type Carrier {
+    id: ID!
+    name: String!
+    slug: String
+    driver: String
+    link_url: String
+    description: String
+    shipping_amount: Int
+    is_enabled: Boolean!
+    options: [CarrierOption!]! @hasMany
+}
+
+type CarrierOption {
+    id: ID!
+    name: String!
+    description: String
+    price: Int!
+    is_enabled: Boolean!
+    carrier: Carrier! @belongsTo
+    zone: Zone! @belongsTo
+}
+
+type PaymentMethod {
+    id: ID!
+    title: String!
+    slug: String
+    logo: String
+    link_url: String
+    description: String
+    instructions: String
+    driver: String
+    is_enabled: Boolean!
+}
+
+type Discount {
+    id: ID!
+    is_active: Boolean!
+    code: String!
+    type: String!
+    value: Int!
+    apply_to: String!
+    min_required: String!
+    min_required_value: String
+    eligibility: String!
+    usage_limit: Int
+    usage_limit_per_user: Boolean!
+    total_use: Int!
+    start_at: DateTime!
+    end_at: DateTime
+    zone: Zone! @belongsTo
+}
+
+type Country {
+    id: ID!
+    name: String!
+    name_official: String!
+    region: String!
+    subregion: String
+    cca2: String!
+    cca3: String!
+    flag: String!
+    latitude: Float!
+    longitude: Float!
+}
+
+type Currency {
+    id: ID!
+    name: String!
+    code: String!
+    symbol: String!
+    format: String!
+    exchange_rate: Float
+    is_enabled: Boolean!
+}
+
+type Legal {
+    id: ID!
+    title: String!
+    slug: String
+    content: String
+    is_enabled: Boolean!
+}

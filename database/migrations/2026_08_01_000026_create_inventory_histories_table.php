@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('inventory_histories', function (Blueprint $table): void {
+            $table->id();
+            $table->morphs('stockable');
+            $table->nullableMorphs('reference');
+            $table->integer('quantity');
+            $table->integer('old_quantity')->default(0);
+            $table->string('event', 75)->nullable();
+            $table->text('description')->nullable();
+            $table->foreignId('inventory_id')->constrained('inventories')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('inventory_histories');
+    }
+};

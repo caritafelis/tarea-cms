@@ -1,0 +1,64 @@
+type MediaLibrary {
+    id: ID!
+    name: String
+    file_name: String!
+    mime_type: String
+    size: Int
+    disk: String
+    collection_name: String
+    custom_properties: JSON
+    conversions_disk: String
+    folder: MediaFolder @belongsTo(relation: "mediaFolder")
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type ProductTag {
+    id: ID!
+    name: String!
+    slug: String
+    description: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Channel {
+    id: ID!
+    name: String!
+    code: String
+    currency: Currency @belongsTo
+    zone: Zone @belongsTo
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Geolocation {
+    id: ID!
+    latitude: Float!
+    longitude: Float!
+    city: String
+    state: String
+    country: String
+    ip_address: String
+    model_type: String!
+    model_id: ID!
+    created_at: DateTime!
+}
+
+type TaxRateRule {
+    id: ID!
+    taxable_type: String!
+    taxable_id: ID
+    taxRate: TaxRate! @belongsTo(relation: "taxRate")
+    zone: Zone @belongsTo
+}
+
+type TaxProvider {
+    id: ID!
+    name: String!
+    driver: String!
+    is_active: Boolean!
+    settings: JSON
+    created_at: DateTime!
+    updated_at: DateTime!
+}

@@ -1,0 +1,163 @@
+type Team {
+    id: ID!
+    name: String!
+    slug: String
+    owner: User! @belongsTo(relation: "owner")
+    members: [User!]! @belongsToMany
+    invitations: [TeamInvitation!]! @hasMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type TeamInvitation {
+    id: ID!
+    email: String!
+    role: String
+    team: Team! @belongsTo
+    created_at: DateTime!
+}
+
+type Webhook {
+    id: ID!
+    url: String!
+    events: JSON!
+    is_active: Boolean!
+    description: String
+    logs: [WebhookLog!]! @hasMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type WebhookLog {
+    id: ID!
+    event: String!
+    payload: JSON
+    response_status: Int
+    response_body: String
+    delivered_at: DateTime
+    webhook: Webhook! @belongsTo
+}
+
+type ApiKey {
+    id: ID!
+    name: String!
+    abilities: JSON!
+    environment: String
+    last_used_at: DateTime
+    expires_at: DateTime
+    created_at: DateTime!
+}
+
+type Plan {
+    id: ID!
+    name: String!
+    slug: String
+    description: String
+    price: Float!
+    interval: String!
+    interval_count: Int!
+    trial_days: Int
+    features: JSON
+    is_active: Boolean!
+    stripe_price_id: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type SaaSSubscription {
+    id: ID!
+    name: String!
+    stripe_id: String
+    stripe_status: String
+    stripe_price: String
+    quantity: Int
+    trial_ends_at: DateTime
+    ends_at: DateTime
+    owner: User! @morphTo
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Plugin {
+    id: ID!
+    name: String!
+    slug: String!
+    version: String
+    is_active: Boolean!
+    settings: JSON
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type AIInsight {
+    id: ID!
+    model_type: String!
+    model_id: ID!
+    insight: String!
+    metadata: JSON
+    created_at: DateTime!
+}
+
+input CreateTeamInput {
+    name: String!
+    slug: String
+}
+
+input UpdateTeamInput {
+    name: String
+    slug: String
+}
+
+input CreateWebhookInput {
+    url: String!
+    events: JSON!
+    is_active: Boolean
+    secret: String
+    description: String
+}
+
+input UpdateWebhookInput {
+    url: String
+    events: JSON
+    is_active: Boolean
+    secret: String
+    description: String
+}
+
+type Role {
+    id: ID!
+    name: String!
+    guard_name: String!
+    permissions: [Permission!]! @belongsToMany
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Permission {
+    id: ID!
+    name: String!
+    guard_name: String!
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Backup {
+    id: ID!
+    disk: String
+    path: String
+    size_bytes: String!
+    status: String
+    type: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Setting {
+    id: ID!
+    key: String!
+    group: String!
+    display_name: String
+    value: JSON
+    created_at: DateTime!
+    updated_at: DateTime!
+}

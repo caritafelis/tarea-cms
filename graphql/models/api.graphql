@@ -1,0 +1,220 @@
+# API GraphQL = paridad con REST. snake_case como el resto del schema. Todo exige token (@guard).
+# apiVisible = reglas de ScopesToVisible | apiOwned = reglas de ScopesToOwner | @can = mismas policies que REST
+
+extend type Query {
+    me: User @auth
+
+    # ---- Contenido ----
+    posts(slug: String @eq, status: String @eq, search: String @builder(method: "App\\GraphQL\\Builders\\Filters@search"), sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Post!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiVisible"])
+    post(id: ID @eq, slug: String @eq): Post @guard @find(scopes: ["apiVisible"])
+    pages(slug: String @eq, status: String @eq, search: String @builder(method: "App\\GraphQL\\Builders\\Filters@search"), sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Page!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiVisible"])
+    page(id: ID @eq, slug: String @eq): Page @guard @find(scopes: ["apiVisible"])
+    legals(slug: String @eq): [Legal!]! @guard @all(scopes: ["apiVisible"])
+    legal(id: ID @eq, slug: String @eq): Legal @guard @find(scopes: ["apiVisible"])
+    cpts(slug: String @eq, sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Cpt!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiVisible"])
+    cpt(id: ID @eq, slug: String @eq): Cpt @guard @find(scopes: ["apiVisible"])
+    cptDefinitions(cpt_id: ID @eq, sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [CptDefinition!]! @guard @paginate(defaultCount: 50, maxCount: 100)
+    cptDefinition(id: ID! @eq): CptDefinition @guard @find
+    cptEntries(slug: String @eq, status: String @eq, cpt_id: ID @eq, search: String @builder(method: "App\\GraphQL\\Builders\\Filters@search"), sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [CptEntry!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiVisible"])
+    cptEntry(id: ID @eq, slug: String @eq): CptEntry @guard @find(scopes: ["apiVisible"])
+    mediaFolders(parent_id: ID @eq): [MediaFolder!]! @guard @paginate(defaultCount: 50, maxCount: 100)
+    mediaFolder(id: ID! @eq): MediaFolder @guard @find
+    mediaLibraries(media_folder_id: ID @eq): [MediaLibrary!]! @guard @paginate(defaultCount: 25, maxCount: 100)
+    mediaLibrary(id: ID! @eq): MediaLibrary @guard @find
+    settings(group: String @eq, key: String @eq): [Setting!]! @guard @paginate(defaultCount: 50, maxCount: 100, scopes: ["apiVisible"])
+    setting(id: ID @eq, key: String @eq): Setting @guard @find(scopes: ["apiVisible"])
+
+    # ---- Catalogo ----
+    products(slug: String @eq, sku: String @eq, type: String @eq, featured: Boolean @eq, brand_id: ID @eq, supplier_id: ID @eq, category_id: ID @builder(method: "App\\GraphQL\\Builders\\Filters@category"), search: String @builder(method: "App\\GraphQL\\Builders\\Filters@search"), sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Product!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiVisible"])
+    product(id: ID @eq, slug: String @eq, sku: String @eq): Product @guard @find(scopes: ["apiVisible"])
+    productVariants(product_id: ID @eq, sku: String @eq): [ProductVariant!]! @guard @paginate(defaultCount: 25, maxCount: 100)
+    productVariant(id: ID @eq, sku: String @eq): ProductVariant @guard @find
+    categories(slug: String @eq, parent_id: ID @eq, search: String @builder(method: "App\\GraphQL\\Builders\\Filters@search"), sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Category!]! @guard @paginate(defaultCount: 50, maxCount: 100, scopes: ["apiVisible"])
+    category(id: ID @eq, slug: String @eq): Category @guard @find(scopes: ["apiVisible"])
+    brands(slug: String @eq, sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Brand!]! @guard @paginate(defaultCount: 50, maxCount: 100, scopes: ["apiVisible"])
+    brand(id: ID @eq, slug: String @eq): Brand @guard @find(scopes: ["apiVisible"])
+    collections(slug: String @eq, sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Collection!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiVisible"])
+    collection(id: ID @eq, slug: String @eq): Collection @guard @find(scopes: ["apiVisible"])
+    collectionRules(collection_id: ID @eq): [CollectionRule!]! @guard @paginate(defaultCount: 50, maxCount: 100)
+    collectionRule(id: ID! @eq): CollectionRule @guard @find
+    attributes: [Attribute!]! @guard @all
+    attribute(id: ID @eq, slug: String @eq): Attribute @guard @find
+    attributeValues(attribute_id: ID @eq): [AttributeValue!]! @guard @paginate(defaultCount: 50, maxCount: 100)
+    attributeValue(id: ID! @eq): AttributeValue @guard @find
+    reviews(approved: Boolean @eq, sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Review!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiVisible"])
+    review(id: ID! @eq): Review @guard @find(scopes: ["apiVisible"])
+    productTags: [ProductTag!]! @guard @all
+    productTag(id: ID @eq, slug: String @eq): ProductTag @guard @find
+
+    # ---- Referencias ----
+    countries: [Country!]! @guard @all
+    country(id: ID @eq, code: String @eq): Country @guard @find
+    currencies: [Currency!]! @guard @all(scopes: ["apiVisible"])
+    currency(id: ID @eq, code: String @eq): Currency @guard @find(scopes: ["apiVisible"])
+    zones: [Zone!]! @guard @all
+    zone(id: ID! @eq): Zone @guard @find
+    taxZones: [TaxZone!]! @guard @all
+    taxZone(id: ID! @eq): TaxZone @guard @find
+    taxRates(tax_zone_id: ID @eq): [TaxRate!]! @guard @paginate(defaultCount: 50, maxCount: 100)
+    taxRate(id: ID! @eq): TaxRate @guard @find
+    carriers: [Carrier!]! @guard @all
+    carrier(id: ID! @eq): Carrier @guard @find
+    carrierOptions(carrier_id: ID @eq): [CarrierOption!]! @guard @paginate(defaultCount: 50, maxCount: 100)
+    carrierOption(id: ID! @eq): CarrierOption @guard @find
+    paymentMethods: [PaymentMethod!]! @guard @all(scopes: ["apiVisible"])
+    paymentMethod(id: ID! @eq): PaymentMethod @guard @find(scopes: ["apiVisible"])
+    channels: [Channel!]! @guard @all
+    channel(id: ID! @eq): Channel @guard @find
+
+    # ---- Storefront del cliente (solo lo propio) ----
+    carts(completed: Boolean @builder(method: "App\\GraphQL\\Builders\\Filters@completed")): [Cart!]! @guard @paginate(model: "App\\Models\\Cart\\Cart", defaultCount: 25, maxCount: 100, scopes: ["apiOwned"])
+    cart(id: ID! @eq): Cart @guard @find(model: "App\\Models\\Cart\\Cart", scopes: ["apiOwned"])
+    cartLines(cart_id: ID @eq): [CartLine!]! @guard @paginate(model: "App\\Models\\Cart\\CartLine", defaultCount: 50, maxCount: 100, scopes: ["apiOwned"])
+    cartLine(id: ID! @eq): CartLine @guard @find(model: "App\\Models\\Cart\\CartLine", scopes: ["apiOwned"])
+    cartAddresses(cart_id: ID @eq): [CartAddress!]! @guard @paginate(model: "App\\Models\\Cart\\CartAddress", defaultCount: 10, maxCount: 50, scopes: ["apiOwned"])
+    cartAddress(id: ID! @eq): CartAddress @guard @find(model: "App\\Models\\Cart\\CartAddress", scopes: ["apiOwned"])
+    cartShippingOptions(cart_id: ID!): ShippingQuote! @guard @field(resolver: "App\\GraphQL\\Queries\\CartShippingOptions")
+    orders(status: String @eq, sort: String @builder(method: "App\\GraphQL\\Builders\\Filters@sort")): [Order!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiOwned"])
+    order(id: ID @eq, number: String @eq): Order @guard @find(scopes: ["apiOwned"])
+    addresses: [Address!]! @guard @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiOwned"])
+    address(id: ID! @eq): Address @guard @find(scopes: ["apiOwned"])
+
+    # ---- Solo con permiso (misma policy que REST: view_any_<modelo>) ----
+    users(email: String @eq, search: String @builder(method: "App\\GraphQL\\Builders\\Filters@search")): [User!]! @guard @can(ability: "viewAny", model: "App\\Models\\User") @paginate(defaultCount: 25, maxCount: 100)
+    user(id: ID! @eq): User @guard @can(ability: "viewAny", model: "App\\Models\\User") @find
+    discounts(code: String @eq): [Discount!]! @guard @can(ability: "viewAny", model: "App\\Models\\Discount") @paginate(defaultCount: 25, maxCount: 100)
+    discount(id: ID @eq, code: String @eq): Discount @guard @can(ability: "viewAny", model: "App\\Models\\Discount") @find
+    inventories(product_variant_id: ID @eq): [Inventory!]! @guard @can(ability: "viewAny", model: "App\\Models\\Inventory") @paginate(defaultCount: 25, maxCount: 100)
+    inventory(id: ID! @eq): Inventory @guard @can(ability: "viewAny", model: "App\\Models\\Inventory") @find
+    suppliers: [Supplier!]! @guard @can(ability: "viewAny", model: "App\\Models\\Supplier") @paginate(defaultCount: 25, maxCount: 100)
+    supplier(id: ID! @eq): Supplier @guard @can(ability: "viewAny", model: "App\\Models\\Supplier") @find
+    paymentTransactions(order_id: ID @eq, status: String @eq): [PaymentTransaction!]! @guard @can(ability: "viewAny", model: "App\\Models\\Payment\\PaymentTransaction") @paginate(model: "App\\Models\\Payment\\PaymentTransaction", defaultCount: 25, maxCount: 100)
+    paymentTransaction(id: ID! @eq): PaymentTransaction @guard @can(ability: "viewAny", model: "App\\Models\\Payment\\PaymentTransaction") @find(model: "App\\Models\\Payment\\PaymentTransaction")
+    orderItems(order_id: ID @eq): [OrderItem!]! @guard @can(ability: "viewAny", model: "App\\Models\\OrderItem") @paginate(defaultCount: 50, maxCount: 100)
+    orderItem(id: ID! @eq): OrderItem @guard @can(ability: "viewAny", model: "App\\Models\\OrderItem") @find
+    orderAddresses: [OrderAddress!]! @guard @can(ability: "viewAny", model: "App\\Models\\OrderAddress") @paginate(defaultCount: 50, maxCount: 100)
+    orderAddress(id: ID! @eq): OrderAddress @guard @can(ability: "viewAny", model: "App\\Models\\OrderAddress") @find
+    orderShippings(order_id: ID @eq): [OrderShipping!]! @guard @can(ability: "viewAny", model: "App\\Models\\OrderShipping") @paginate(defaultCount: 50, maxCount: 100)
+    orderShipping(id: ID! @eq): OrderShipping @guard @can(ability: "viewAny", model: "App\\Models\\OrderShipping") @find
+    orderShippingEvents: [OrderShippingEvent!]! @guard @can(ability: "viewAny", model: "App\\Models\\OrderShippingEvent") @paginate(defaultCount: 50, maxCount: 100)
+    orderShippingEvent(id: ID! @eq): OrderShippingEvent @guard @can(ability: "viewAny", model: "App\\Models\\OrderShippingEvent") @find
+    orderTaxLines(order_id: ID @eq): [OrderTaxLine!]! @guard @can(ability: "viewAny", model: "App\\Models\\OrderTaxLine") @paginate(defaultCount: 50, maxCount: 100)
+    orderTaxLine(id: ID! @eq): OrderTaxLine @guard @can(ability: "viewAny", model: "App\\Models\\OrderTaxLine") @find
+    cartLineAdjustments(cart_line_id: ID @eq): [CartLineAdjustment!]! @guard @can(ability: "viewAny", model: "App\\Models\\Cart\\CartLineAdjustment") @paginate(model: "App\\Models\\Cart\\CartLineAdjustment", defaultCount: 50, maxCount: 100)
+    cartLineAdjustment(id: ID! @eq): CartLineAdjustment @guard @can(ability: "viewAny", model: "App\\Models\\Cart\\CartLineAdjustment") @find(model: "App\\Models\\Cart\\CartLineAdjustment")
+    cartLineTaxLines(cart_line_id: ID @eq): [CartLineTaxLine!]! @guard @can(ability: "viewAny", model: "App\\Models\\Cart\\CartLineTaxLine") @paginate(model: "App\\Models\\Cart\\CartLineTaxLine", defaultCount: 50, maxCount: 100)
+    cartLineTaxLine(id: ID! @eq): CartLineTaxLine @guard @can(ability: "viewAny", model: "App\\Models\\Cart\\CartLineTaxLine") @find(model: "App\\Models\\Cart\\CartLineTaxLine")
+
+    # ---- Equipos (solo los propios) ----
+    teams: [Team!]! @guard @can(ability: "viewAny", model: "App\\Models\\Team") @paginate(defaultCount: 25, maxCount: 100, scopes: ["apiOwned"])
+    team(id: ID! @eq): Team @guard @can(ability: "viewAny", model: "App\\Models\\Team") @find(scopes: ["apiOwned"])
+}
+
+extend type Mutation {
+    # ---- Carrito (dueño y precio los fija el servidor) ----
+    createCart(input: StoreCartInput! @spread): Cart! @guard @can(ability: "create", model: "App\\Models\\Cart\\Cart") @create(model: "App\\Models\\Cart\\Cart")
+    updateCart(id: ID!, input: UpdateCartInput! @spread): Cart! @guard @can(ability: "update", find: "id", model: "App\\Models\\Cart\\Cart") @update(model: "App\\Models\\Cart\\Cart")
+    addCartLine(input: StoreCartLineInput! @spread): CartLine! @guard @can(ability: "create", model: "App\\Models\\Cart\\CartLine") @create(model: "App\\Models\\Cart\\CartLine")
+    updateCartLine(id: ID!, quantity: Int!): CartLine! @guard @can(ability: "update", find: "id", model: "App\\Models\\Cart\\CartLine") @update(model: "App\\Models\\Cart\\CartLine")
+    removeCartLine(id: ID!): CartLine @guard @can(ability: "delete", find: "id", model: "App\\Models\\Cart\\CartLine") @delete(model: "App\\Models\\Cart\\CartLine")
+    createCartAddress(input: StoreCartAddressInput! @spread): CartAddress! @guard @can(ability: "create", model: "App\\Models\\Cart\\CartAddress") @create(model: "App\\Models\\Cart\\CartAddress")
+    updateCartAddress(id: ID!, input: UpdateCartAddressInput! @spread): CartAddress! @guard @can(ability: "update", find: "id", model: "App\\Models\\Cart\\CartAddress") @update(model: "App\\Models\\Cart\\CartAddress")
+    deleteCartAddress(id: ID!): CartAddress @guard @can(ability: "delete", find: "id", model: "App\\Models\\Cart\\CartAddress") @delete(model: "App\\Models\\Cart\\CartAddress")
+    setCartShippingOption(cart_id: ID!, shipping_option_id: ID!): CartTotals! @guard @field(resolver: "App\\GraphQL\\Mutations\\SetCartShippingOption")
+    checkoutCart(cart_id: ID!, payment_method_id: ID!): CheckoutPayload! @guard @field(resolver: "App\\GraphQL\\Mutations\\CheckoutCart")
+
+    # ---- Direcciones de la cuenta ----
+    createAddress(input: StoreAddressInput! @spread): Address! @guard @can(ability: "create", model: "App\\Models\\Address") @create
+    updateAddress(id: ID!, input: UpdateAddressInput! @spread): Address! @guard @can(ability: "update", find: "id") @update
+    deleteAddress(id: ID!): Address @guard @can(ability: "delete", find: "id") @delete
+
+    # ---- Resenas (approved lo fija el servidor) ----
+    createReview(input: StoreReviewInput! @spread): Review! @guard @can(ability: "create", model: "App\\Models\\Review") @create
+    updateReview(id: ID!, input: UpdateReviewInput! @spread): Review! @guard @can(ability: "update", find: "id") @update
+    deleteReview(id: ID!): Review @guard @can(ability: "delete", find: "id") @delete
+
+    # ---- Equipos ----
+    createTeam(input: CreateTeamInput! @spread): Team! @guard @can(ability: "create", model: "App\\Models\\Team") @create
+    updateTeam(id: ID!, input: UpdateTeamInput! @spread): Team! @guard @can(ability: "update", find: "id") @update
+    deleteTeam(id: ID!): Team @guard @can(ability: "delete", find: "id") @delete
+}
+
+input StoreCartInput { currency_code: String!, channel_id: ID, zone_id: ID, coupon_code: String }
+input UpdateCartInput { zone_id: ID, coupon_code: String }
+input StoreCartLineInput { cart_id: ID!, purchasable_type: String!, purchasable_id: ID!, quantity: Int! }
+input StoreCartAddressInput { cart_id: ID!, type: String!, first_name: String, last_name: String!, company: String, address_1: String!, address_2: String, city: String!, state: String, postal_code: String!, phone: String, country_id: ID }
+input UpdateCartAddressInput { type: String, first_name: String, last_name: String, company: String, address_1: String, address_2: String, city: String, state: String, postal_code: String, phone: String, country_id: ID }
+input StoreAddressInput { first_name: String!, last_name: String!, company_name: String, street_address: String!, street_address_plus: String, postal_code: String!, city: String!, state: String, phone_number: String, shipping_default: Boolean, billing_default: Boolean, type: String, country_id: ID! }
+input UpdateAddressInput { first_name: String, last_name: String, company_name: String, street_address: String, street_address_plus: String, postal_code: String, city: String, state: String, phone_number: String, shipping_default: Boolean, billing_default: Boolean, type: String, country_id: ID }
+input StoreReviewInput { reviewrateable_type: String!, reviewrateable_id: ID!, rating: Int!, title: String, content: String, is_recommended: Boolean }
+input UpdateReviewInput { rating: Int, title: String, content: String, is_recommended: Boolean }
+
+type CheckoutPayload { order: Order!, payment: JSON }
+type ShippingOption { id: ID!, name: String, description: String, carrier: String, amount: Int!, free: Boolean! }
+type ShippingQuote { requires_shipping: Boolean!, selected: ID, issues: JSON, options: [ShippingOption!]! }
+type CartTotals { subtotal: Float!, discount: Float!, shipping: Float!, tax: Float!, total: Float! }
+type MediaFile { name: String, filename: String, mime: String, size: Int, collection: String, alt: String, url: String!, thumb: String, large: String, webp: String }
+
+# ===== Campos que REST expone y GraphQL no tenia =====
+extend type Product {
+    gtin: String
+    mpn: String
+    security_stock: Int
+    manage_stock: Boolean
+    stock_status: String
+    min_qty: Int
+    max_qty: Int
+    sold_individually: Boolean
+    tax_status: String
+    tax_class: String
+    shipping_enabled: Boolean
+    shipping_free: Boolean
+    ship_internationally: Boolean
+    shipping_requires_box: Boolean
+    shipping_class: String
+    shipping_origin_country: String
+    catalog_visibility: String
+    menu_order: Int
+    enable_reviews: Boolean
+    pricing: JSON
+    seo: JSON
+    dynamic_fields: JSON
+    upsells: [Product!]!
+    cross_sells: [Product!]! @rename(attribute: "crossSells")
+}
+extend type Post { user: User @belongsTo, dynamic_fields: JSON }
+extend type Page { dynamic_fields: JSON }
+extend type CptEntry { sections: [ContentSection!]! @hasMany(relation: "contentSections"), dynamic_fields: JSON }
+extend type Cpt { is_standalone: Boolean, standalone_label: String }
+extend type CptDefinition { default_value: String, cpt: Cpt @belongsTo(relation: "cpts"), parent: CptDefinition @belongsTo, created_at: DateTime, updated_at: DateTime }
+extend type OrderItem { purchase_note: String, downloads: JSON }
+extend type MediaLibrary { files: [MediaFile!]! @field(resolver: "App\\GraphQL\\Queries\\MediaFiles") }
+
+extend type Address { created_at: DateTime, updated_at: DateTime }
+extend type AttributeValue { created_at: DateTime, updated_at: DateTime }
+extend type Attribute { created_at: DateTime, updated_at: DateTime }
+extend type CarrierOption { created_at: DateTime, updated_at: DateTime }
+extend type Carrier { created_at: DateTime, updated_at: DateTime }
+extend type CartAddress { created_at: DateTime, updated_at: DateTime }
+extend type CartLineAdjustment { created_at: DateTime, updated_at: DateTime }
+extend type CartLineTaxLine { created_at: DateTime, updated_at: DateTime }
+extend type CartLine { created_at: DateTime, updated_at: DateTime }
+extend type CollectionRule { created_at: DateTime, updated_at: DateTime }
+extend type Country { created_at: DateTime, updated_at: DateTime }
+extend type Cpt { created_at: DateTime, updated_at: DateTime }
+extend type Currency { created_at: DateTime, updated_at: DateTime }
+extend type Discount { created_at: DateTime, updated_at: DateTime }
+extend type Inventory { created_at: DateTime, updated_at: DateTime }
+extend type Legal { created_at: DateTime, updated_at: DateTime }
+extend type MediaFolder { created_at: DateTime, updated_at: DateTime }
+extend type OrderAddress { created_at: DateTime, updated_at: DateTime }
+extend type OrderItem { created_at: DateTime, updated_at: DateTime }
+extend type OrderShippingEvent { created_at: DateTime, updated_at: DateTime }
+extend type OrderShipping { created_at: DateTime, updated_at: DateTime }
+extend type OrderTaxLine { created_at: DateTime, updated_at: DateTime }
+extend type PaymentMethod { created_at: DateTime, updated_at: DateTime }
+extend type Review { created_at: DateTime, updated_at: DateTime }
+extend type Supplier { created_at: DateTime, updated_at: DateTime }
+extend type TaxRate { created_at: DateTime, updated_at: DateTime }
+extend type TaxZone { created_at: DateTime, updated_at: DateTime }
+extend type Zone { created_at: DateTime, updated_at: DateTime }

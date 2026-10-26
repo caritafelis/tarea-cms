@@ -1,0 +1,230 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: production
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+
+    volumes:
+      - laravel_storage:/var/www/html/storage
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
+
+    networks:
+      - app
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+
+    restart: unless-stopped
+
+    ports:
+      - "${APP_PORT:-8080}:80"
+
+    volumes:
+      - laravel_storage:/var/www/html/storage:ro
+
+    depends_on:
+      - app
+
+    networks:
+      - app
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: production
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+
+    command:
+      - php
+      - artisan
+      - queue:work
+      - redis
+      - --sleep=1
+      - --tries=3
+      - --timeout=120
+      - --max-time=3600
+      - --max-jobs=1000
+
+    volumes:
+      - laravel_storage:/var/www/html/storage
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
+
+    networks:
+      - app
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: production
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+
+    command:
+      - php
+      - artisan
+      - schedule:work
+
+    volumes:
+      - laravel_storage:/var/www/html/storage
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
+
+    networks:
+      - app
+
+  mysql:
+    image: mysql:8.4
+
+    restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --skip-name-resolve
+      - --max_connections=200
+      - --innodb_buffer_pool_size=512M
+      - --innodb_log_file_size=128M
+      - --performance-schema=ON
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD}
+
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+    networks:
+      - app
+
+  redis:
+    image: redis:7-alpine
+
+    restart: unless-stopped
+
+    command:
+      - redis-server
+      - --appendonly
+      - yes
+      - --maxmemory-policy
+      - allkeys-lru
+
+    volumes:
+      - redis_data:/data
+
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+    networks:
+      - app
+
+volumes:
+
+  mysql_data:
+    driver: local
+
+  redis_data:
+    driver: local
+
+  laravel_storage:
+    driver: local
+
+networks:
+
+  app:
+    driver: bridge

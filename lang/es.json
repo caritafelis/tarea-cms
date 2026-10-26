@@ -1,0 +1,17 @@
+{
+    "A paginated list of :model items.": "Una lista paginada de elementos :model.",
+    "A list of :model items.": "Una lista de elementos :model.",
+    "Pagination information about the list of items.": "Información de paginación de la lista de elementos.",
+    "Information about pagination using a fully featured paginator.": "Información de paginación con el paginador completo.",
+    "Information about pagination using a simple paginator.": "Información de paginación con el paginador simple.",
+    "Number of items in the current page.": "Cantidad de elementos en la página actual.",
+    "Index of the current page.": "Índice de la página actual.",
+    "Index of the first item in the current page.": "Índice del primer elemento de la página actual.",
+    "Index of the last item in the current page.": "Índice del último elemento de la página actual.",
+    "Index of the last available page.": "Índice de la última página disponible.",
+    "Number of items per page.": "Cantidad de elementos por página.",
+    "Number of total available items.": "Total de elementos disponibles.",
+    "Are there more pages after this one?": "¿Hay más páginas después de esta?",
+    "Limits number of fetched items.": "Limita la cantidad de elementos obtenidos.",
+    "The offset from which items are returned.": "Desplazamiento desde el cual se devuelven los elementos."
+}

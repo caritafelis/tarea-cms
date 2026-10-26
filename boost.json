@@ -1,0 +1,39 @@
+{
+    "agents": [
+        "amp",
+        "claude_code",
+        "codex",
+        "cursor",
+        "gemini",
+        "copilot",
+        "junie",
+        "kiro",
+        "opencode"
+    ],
+    "cloud": false,
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch": false,
+    "packages": [
+        "spatie/laravel-medialibrary",
+        "spatie/laravel-permission",
+        "spatie/laravel-sluggable",
+        "spatie/laravel-translatable"
+    ],
+    "sail": false,
+    "skills": [
+        "infer-conventions",
+        "cashier-stripe-development",
+        "fortify-development",
+        "laravel-best-practices",
+        "testing-best-practices",
+        "scout-development",
+        "wayfinder-development",
+        "inertia-react-development",
+        "tailwindcss-development",
+        "medialibrary-development",
+        "laravel-permission-development",
+        "sluggable-development",
+        "translatable-development"
+    ]
+}

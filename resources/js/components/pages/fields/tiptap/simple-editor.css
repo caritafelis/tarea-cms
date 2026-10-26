@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+    --tt-toolbar-height: 44px;
+    --tt-theme-text: var(--tt-gray-light-900);
+
+    .dark & {
+        --tt-theme-text: var(--tt-gray-dark-900);
+    }
+}
+
+body {
+    font-family: "Raleway", sans-serif;
+    color: var(--tt-theme-text);
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    padding: 0;
+    overscroll-behavior-y: none;
+}
+
+html,
+body {
+    overscroll-behavior-x: none;
+}
+
+html,
+body,
+#root,
+#app {
+    height: 100%;
+    background-color: var(--tt-bg-color);
+}
+
+::-webkit-scrollbar {
+    width: 0.25rem;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--tt-scrollbar-color) transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--tt-scrollbar-color);
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tiptap.ProseMirror {
+    font-family: "DM Sans", sans-serif;
+}
+
+.simple-editor-wrapper {
+    width: auto;
+    height: 50vh;
+    overflow: auto;
+}
+
+.simple-editor-content {
+    max-width: full;
+    width: 100%;
+    height: full;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.simple-editor-content .tiptap.ProseMirror.simple-editor {
+    flex: 1;
+    padding: 1rem 1rem 10vh;
+}
+
+@media screen and (max-width: 480px) {
+    .simple-editor-content .tiptap.ProseMirror.simple-editor {
+        padding: 1rem 1rem 10vh;
+    }
+}
+
+/* Limpiar los márgenes por defecto de Tiptap */
+.tiptap.ProseMirror p {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    /* Ajusta este valor al espacio que desees (ej: 4px, 8px, 0.5rem) */
+}
+
+/* Evitar que el último párrafo deje espacio abajo innecesariamente */
+.tiptap.ProseMirror p:last-child {
+    margin-bottom: 0;
+}
+
+/* Si los encabezados también tienen mucho espacio, ajústalos aquí */
+.tiptap.ProseMirror h1,
+.tiptap.ProseMirror h2,
+.tiptap.ProseMirror h3,
+.tiptap.ProseMirror h4 {
+    margin-top: 0rem;
+    margin-bottom: 0.5rem;
+}
+
+.tiptap.ProseMirror h1:first-child,
+.tiptap.ProseMirror h2:first-child,
+.tiptap.ProseMirror p:first-child {
+    margin-top: 0;
+}
+
+/* Opción 1: Apuntando directamente a los elementos p dentro del editor */
+.tiptap.ProseMirror.simple-editor p {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+    /* Ajusta este valor (4px o 8px) a tu gusto */
+}
+
+/* Opción 2: Si el problema persiste, usa el selector universal interno */
+.simple-editor-content .simple-editor p {
+    margin-top: 0 !important;
+    margin-bottom: 6px !important;
+}

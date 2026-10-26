@@ -1,0 +1,26 @@
+services:
+
+  vite:
+    image: node:22-alpine
+
+    working_dir: /var/www/html
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - ./:/var/www/html
+      - node_modules:/var/www/html/node_modules
+
+    command: >
+      sh -c " npm install && npm run dev -- --host 0.0.0.0 "
+
+    networks:
+      - app
+
+volumes:
+  node_modules:
+
+networks:
+  app:
+    external: true

@@ -1,0 +1,161 @@
+type Order {
+    id: ID!
+    number: String!
+    price_amount: Int
+    tax_amount: Int
+    status: String!
+    payment_status: String!
+    shipping_status: String!
+    currency_code: String!
+    notes: String
+    discount_code: String
+    cancelled_at: DateTime
+    archived_at: DateTime
+    customer: User @belongsTo
+    channel: Channel @belongsTo
+    zone: Zone @belongsTo
+    paymentMethod: PaymentMethod @belongsTo(relation: "paymentMethod")
+    billingAddress: OrderAddress @belongsTo(relation: "billingAddress")
+    shippingAddress: OrderAddress @belongsTo(relation: "shippingAddress")
+    items: [OrderItem!]! @hasMany
+    shipments: [OrderShipping!]! @hasMany
+    taxLines: [OrderTaxLine!]! @hasMany(relation: "taxLines")
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type OrderAddress {
+    id: ID!
+    first_name: String!
+    last_name: String!
+    company: String
+    street_address: String!
+    street_address_plus: String
+    postal_code: String!
+    city: String!
+    state: String
+    phone: String
+    country_name: String
+    customer: User @belongsTo
+}
+
+type OrderShipping {
+    id: ID!
+    status: String
+    shipped_at: DateTime
+    received_at: DateTime
+    returned_at: DateTime
+    tracking_number: String
+    tracking_url: String
+    order: Order! @belongsTo
+    carrier: Carrier @belongsTo
+    items: [OrderItem!]! @hasMany
+    events: [OrderShippingEvent!]! @hasMany
+}
+
+type OrderShippingEvent {
+    id: ID!
+    status: String!
+    description: String
+    location: String
+    latitude: Float
+    longitude: Float
+    occurred_at: DateTime!
+    shipment: OrderShipping! @belongsTo(relation: "shipment")
+}
+
+type OrderTaxLine {
+    id: ID!
+    code: String!
+    name: String!
+    rate: Float!
+    amount: Int!
+    taxRate: TaxRate @belongsTo(relation: "taxRate")
+}
+
+type OrderItem {
+    id: ID!
+    name: String
+    sku: String
+    quantity: Int!
+    unit_price_amount: Int!
+    tax_amount: Int!
+    discount_amount: Int!
+    fulfillment_status: String
+    order: Order! @belongsTo
+}
+
+type Inventory {
+    id: ID!
+    name: String!
+    code: String!
+    description: String
+    email: String!
+    street_address: String!
+    postal_code: String!
+    city: String!
+    state: String
+    phone_number: String
+    priority: Int!
+    latitude: Float
+    longitude: Float
+    is_default: Boolean!
+    country: Country! @belongsTo
+}
+
+type Cart {
+    id: ID!
+    currency_code: String!
+    coupon_code: String
+    completed_at: DateTime
+    lines: [CartLine!]! @hasMany
+    addresses: [CartAddress!]! @hasMany
+    customer: User @belongsTo
+    channel: Channel @belongsTo
+    zone: Zone @belongsTo
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type CartLine {
+    id: ID!
+    quantity: Int!
+    unit_price_amount: Int!
+    cart: Cart! @belongsTo
+    adjustments: [CartLineAdjustment!]! @hasMany
+    taxLines: [CartLineTaxLine!]! @hasMany(relation: "taxLines")
+}
+
+type CartAddress {
+    id: ID!
+    type: String!
+    first_name: String
+    last_name: String!
+    company: String
+    address_1: String!
+    address_2: String
+    city: String!
+    state: String
+    postal_code: String!
+    phone: String
+    cart: Cart! @belongsTo
+    country: Country @belongsTo
+}
+
+type CartLineAdjustment {
+    id: ID!
+    amount: Int!
+    code: String
+    cartLine: CartLine! @belongsTo(relation: "cartLine")
+    discount: Discount @belongsTo
+}
+
+type CartLineTaxLine {
+    id: ID!
+    code: String!
+    name: String!
+    rate: Float!
+    amount: Int!
+    cartLine: CartLine! @belongsTo(relation: "cartLine")
+    taxRate: TaxRate @belongsTo(relation: "taxRate")
+}

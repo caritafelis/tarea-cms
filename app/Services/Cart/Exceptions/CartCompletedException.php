@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Services\Cart\Exceptions;
+
+use RuntimeException;
+
+final class CartCompletedException extends RuntimeException
+{
+    public function __construct()
+    {
+        parent::__construct(__('shopper-cart::messages.exceptions.cart_completed'));
+    }
+}

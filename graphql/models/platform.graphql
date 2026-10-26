@@ -1,0 +1,32 @@
+# Operaciones de plataforma (SaaS). Solo SuperAdmin (Gate "platform-admin").
+extend type Query {
+    geolocation(model_type: String! @eq, model_id: ID! @eq): Geolocation @find @guard @can(ability: "platform-admin")
+    taxRateRules(tax_rate_id: ID @eq): [TaxRateRule!]! @all @guard @can(ability: "platform-admin")
+    taxProviders: [TaxProvider!]! @all @guard @can(ability: "platform-admin")
+    invoices(order_id: ID @eq): [Invoice!]! @paginate(defaultCount: 25) @guard @can(ability: "platform-admin")
+    orderRefunds(order_id: ID @eq): [OrderRefund!]! @paginate(defaultCount: 25) @guard @can(ability: "platform-admin")
+    orderRefund(id: ID @eq): OrderRefund @find @guard @can(ability: "platform-admin")
+    inventoryHistories(inventory_id: ID @eq): [InventoryHistory!]! @paginate(defaultCount: 50) @guard @can(ability: "platform-admin")
+    fieldGroups(content_type: String @eq): [Cpt!]! @guard @all(scopes: ["apiVisible"])
+    fieldGroup(slug: String @eq): Cpt @guard @find(scopes: ["apiVisible"])
+    teamInvitations: [TeamInvitation!]! @paginate(defaultCount: 25) @guard @can(ability: "platform-admin")
+    webhooks: [Webhook!]! @all @guard @can(ability: "platform-admin")
+    webhook(id: ID @eq): Webhook @find @guard @can(ability: "platform-admin")
+    apiKeys: [ApiKey!]! @all @guard @can(ability: "platform-admin")
+    roles: [Role!]! @all @guard @can(ability: "platform-admin")
+    role(id: ID @eq): Role @find @guard @can(ability: "platform-admin")
+    permissions: [Permission!]! @all @guard @can(ability: "platform-admin")
+    backups: [Backup!]! @paginate(defaultCount: 25) @guard @can(ability: "platform-admin")
+    backup(id: ID @eq): Backup @find @guard @can(ability: "platform-admin")
+    plans: [Plan!]! @guard @can(ability: "platform-admin") @all
+    plan(id: ID @eq): Plan @guard @can(ability: "platform-admin") @find
+    subscriptions: [SaaSSubscription!]! @paginate( model: "App\\Models\\Subscription" defaultCount: 25 ) @guard @can(ability: "platform-admin")
+    plugins: [Plugin!]! @all @guard @can(ability: "platform-admin")
+    aiInsights(model_type: String @eq, model_id: ID @eq): [AIInsight!]! @paginate(defaultCount: 25) @guard @can(ability: "platform-admin")
+}
+extend type Mutation {
+    createOrderRefund(input: CreateOrderRefundInput! @spread): OrderRefund! @guard @can(ability: "platform-admin") @create(model: "App\\Models\\OrderRefund")
+    createWebhook(input: CreateWebhookInput! @spread): Webhook! @guard @can(ability: "platform-admin") @create(model: "App\\Models\\Webhook")
+    updateWebhook(id: ID!, input: UpdateWebhookInput! @spread): Webhook! @guard @can(ability: "platform-admin") @update(model: "App\\Models\\Webhook")
+    deleteWebhook(id: ID!): Webhook @guard @can(ability: "platform-admin") @delete(model: "App\\Models\\Webhook")
+}
